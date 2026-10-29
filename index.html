@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#172554">
+<title>Study Buddy AI</title>
+<style>
+:root{--navy:#172554;--blue:#2563eb;--sky:#eff6ff;--ink:#172033;--muted:#64748b;--line:#dbe4f0;--white:#fff;--green:#15803d;--purple:#6d28d9}
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:linear-gradient(135deg,#172554,#1d4ed8);color:white;padding:22px 18px 24px;border-radius:0 0 24px 24px}
+.top{max-width:780px;margin:auto;display:flex;align-items:center;gap:13px}.logo{height:52px;width:52px;border-radius:17px;background:#ffffff20;display:grid;place-items:center;font-size:29px}
+h1{font-size:25px;margin:0}header p{margin:5px 0 0;color:#dbeafe;font-size:14px}
+main{max-width:780px;margin:18px auto;padding:0 14px 35px}.panel{background:white;border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 4px 16px #1e3a8a08}
+h2{font-size:18px;margin:0 0 13px}label{display:block;font-weight:650;font-size:14px;margin:12px 0 7px}
+input,select,textarea{width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:12px;font:inherit;background:white;color:var(--ink)}textarea{min-height:90px;resize:vertical}
+.modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.mode{border:1px solid var(--line);border-radius:14px;padding:13px 10px;background:white;text-align:left;font:inherit;cursor:pointer}.mode b{display:block;margin-top:5px}.mode small{color:var(--muted)}.mode.selected{border:2px solid var(--blue);background:var(--sky)}
+button.primary{width:100%;border:0;border-radius:13px;background:var(--blue);color:white;font:inherit;font-weight:750;padding:14px;cursor:pointer;margin-top:14px}button.secondary{border:1px solid var(--line);background:white;border-radius:11px;padding:10px 12px;font:inherit;cursor:pointer}
+.result{display:none}.result.show{display:block}.result h2{margin-bottom:8px}.answer{line-height:1.65;white-space:pre-wrap}.pill{display:inline-block;background:#dbeafe;color:#1d4ed8;border-radius:99px;padding:4px 9px;font-size:12px;font-weight:700;margin-bottom:8px}
+.flash{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:18px;text-align:center;min-height:130px;display:grid;place-items:center;cursor:pointer}.flash .front{font-weight:750;font-size:18px}.flash .hint{font-size:12px;color:var(--muted);margin-top:10px}
+.quiz-options{display:grid;gap:8px;margin-top:12px}.quiz-options button{text-align:left}.feedback{margin-top:12px;padding:12px;border-radius:12px;background:#f1f5f9;line-height:1.5}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:8px 12px 24px}
+@media(min-width:600px){.modes{grid-template-columns:repeat(4,minmax(0,1fr))}.panel{padding:22px}}
+</style>
+</head>
+<body>
+<header><div class="top"><div class="logo">🧠</div><div><h1>Study Buddy AI</h1><p>Ask questions · Learn at your level · KG1–Grade 12</p></div></div></header>
+<main>
+<section class="panel">
+<h2>💬 Ask Study Buddy a question</h2>
+<p class="answer">Type your school question in your own words. Choose your level from KG1 to Grade 12, then tap Get an answer.</p>
+<label for="grade">Your level</label><select id="grade"><option>KG1</option><option>KG2</option><option>KG3</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option selected>Grade 5</option><option>Grade 6</option><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11</option><option>Grade 12</option></select>
+<label for="question">Your question</label><textarea id="question" placeholder="Example: Why do plants need sunlight? Or: What is 3/4 + 1/4?" rows="3"></textarea>
+<label for="subject">Subject (optional)</label><select id="subject"><option>Any subject</option><option>Maths</option><option>Science</option><option>English</option><option>Computers</option><option>Social Studies</option><option>History</option><option>Geography</option><option>Languages</option></select>
+<button class="primary" id="ask">✨ Get an answer</button>
+<div id="answerBox" class="feedback" style="display:none;margin-top:14px"></div>
+<hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+<h2>📚 Or practise with a topic</h2>
+<label for="topic">Choose a topic</label><input id="topic" value="Living things and their habitats" placeholder="Type a school topic">
+<label for="subject">Subject</label><select id="subject"><option>Science</option><option>Maths</option><option>Computers</option><option>English</option><option>Any subject</option></select>
+<label>Choose a learning mode</label>
+<div class="modes">
+<button class="mode selected" data-mode="teach">📘<b>Teach me</b><small>Simple explanation</small></button>
+<button class="mode" data-mode="flash">🗂️<b>Flashcards</b><small>Remember facts</small></button>
+<button class="mode" data-mode="quiz">🎯<b>Quiz time</b><small>Test yourself</small></button>
+<button class="mode" data-mode="mistakes">💡<b>Fix mistakes</b><small>Learn from errors</small></button>
+</div>
+<button class="primary" id="start">✨ Start learning</button>
+</section>
+<section class="panel result" id="result" aria-live="polite"></section>
+<section class="panel">
+<h2>🏆 My learning score</h2><p id="scoreText">Quiz points: 0 · Correct answers: 0</p><button class="secondary" id="reset">Reset score</button>
+</section>
+<section class="panel">
+<h2>🛠️ How this prototype works</h2>
+<p class="answer">This version runs in your tablet browser and includes sample lessons plus a basic question-answer demo. It is not connected to a live AI service yet, so it cannot answer every question or support every curriculum perfectly. A trusted adult will need to help connect a secure AI service before it can answer questions worldwide.</p>
+</section>
+</main>
+<footer>Made for the Crescent Innovation Ignite competition · Keep learning and keep asking questions!</footer>
+<script>
+const lessons = {
+habitats:{title:"Living things and their habitats",explain:"A habitat is the natural home of a living thing. It provides food, water, shelter and space. A camel is adapted to a hot desert, while a fish is adapted to living in water. Adaptations are features or behaviours that help living things survive.",cards:[["What is a habitat?","The natural home of a living thing."],["What does a habitat provide?","Food, water, shelter and space."],["Name one desert animal.","A camel."],["What is an adaptation?","A feature or behaviour that helps survival."],["Where is a fish adapted to live?","In water."]],quiz:[["What is a habitat?","A living thing's natural home",["A type of food","A living thing's natural home","A kind of weather"],1],["Which habitat is usually very dry?","Desert",["Rainforest","Pond","Desert"],2],["What can a habitat provide?","Food, water and shelter",["Only toys","Food, water and shelter","Only sunlight"],1],["An adaptation helps an organism…","survive",["survive","do homework","become a rock"],0],["Which animal is adapted to water?","Fish",["Camel","Fish","Eagle"],1]]},
+electricity:{title:"Electricity",explain:"An electric circuit is a complete path that allows electric current to flow. A simple circuit can include a cell, wires, a switch and a bulb. The bulb lights when the circuit is closed. If there is a gap, the circuit is open and the bulb usually stays off.",cards:[["What is a circuit?","A complete path for electric current."],["What does a cell provide?","Electrical energy."],["When does a bulb light?","When the circuit is complete and closed."],["What is an open circuit?","A circuit with a gap."],["What is a conductor?","A material that lets electricity flow easily."]],quiz:[["When does a bulb usually light?","When the circuit is closed",["When the wire has a gap","When the circuit is closed","When there is no cell"],1],["Which part provides electrical energy?","Cell",["Cell","Switch","Bulb"],0],["An open circuit has…","a gap",["no path gap","a gap","extra bulbs"],1],["Which is usually a good conductor?","Copper",["Rubber","Plastic","Copper"],2],["What does a switch do?","Opens or closes a circuit",["Makes water","Opens or closes a circuit","Stores books"],1]]},
+fractions:{title:"Fractions",explain:"A fraction shows equal parts of a whole. The numerator is the top number and tells how many parts are being counted. The denominator is the bottom number and tells how many equal parts make the whole. In 3/4, three parts out of four equal parts are counted.",cards:[["What does the numerator show?","How many parts are being counted."],["What does the denominator show?","The number of equal parts in the whole."],["In 3/4, what is the numerator?","3."],["What is a proper fraction?","A fraction with numerator smaller than denominator."],["What is 1/2 called?","One half."]],quiz:[["In 3/4, what is the numerator?","3",["4","3","7"],1],["Which is a proper fraction?","2/5",["7/3","5/5","2/5"],2],["What does the denominator tell us?","Number of equal parts in the whole",["Number of equal parts in the whole","The colour","The answer to addition"],0],["Which fraction means one half?","1/2",["1/2","2/1","1/4"],0],["How many equal parts are in 3/8?","8",["3","8","11"],1]]},
+computers:{title:"Artificial intelligence",explain:"Artificial intelligence (AI) is technology that can do tasks such as recognising patterns, understanding language or making predictions. A study assistant can use prompts—clear instructions—to explain a topic or create practice questions. AI can make mistakes, so we should check important facts.",cards:[["What does AI stand for?","Artificial intelligence."],["What is a prompt?","An instruction or question given to an AI."],["Why check AI answers?","AI can sometimes make mistakes."],["What is a chatbot?","A program that chats with users."],["What makes a prompt useful?","Clear instructions and enough context."]],quiz:[["What does AI stand for?","Artificial intelligence",["Automatic internet","Artificial intelligence","Amazing information"],1],["What is a prompt?","An instruction to the AI",["A computer cable","An instruction to the AI","A screen"],1],["Why should we check AI facts?","AI can make mistakes",["AI can make mistakes","Computers never work","It makes the screen brighter"],0],["Which is a clearer prompt?","Explain habitats for Grade 5 with examples",["Tell me stuff","Explain habitats for Grade 5 with examples","Do everything"],1],["Can AI always be trusted without checking?","No",["Yes, always","No","Only on Mondays"],1]]},
+default:{title:"Learning something new",explain:"A good learner asks questions, connects new ideas to things they already know, and practises. Break a big topic into small parts. After learning, try to explain the idea in your own words and check whether your explanation makes sense.",cards:[["What is one good study habit?","Practise and explain ideas in your own words."],["What should you do when stuck?","Ask a clear question and try a small step."],["Why review your answers?","To find and correct mistakes."],["What is a useful prompt?","A clear instruction with helpful context."],["How can you check a fact?","Compare it with a trusted source."]],quiz:[["What is a useful study habit?","Practise and review",["Never ask questions","Practise and review","Skip every hard part"],1],["What should you do when stuck?","Ask a clear question",["Give up immediately","Ask a clear question","Hide the work"],1],["Why review answers?","To find mistakes and improve",["To find mistakes and improve","To make the page longer","To avoid learning"],0],["A clear prompt should include…","what you need",["only random words","what you need","no details at all"],1],["Should important facts be checked?","Yes",["No","Yes","Never"],1]]}
+};
+let mode="teach", score=0, correct=0, qi=0, currentQuiz=[], ci=0, flipped=false;
+const $=id=>document.getElementById(id);
+document.querySelectorAll(".mode").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".mode").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");mode=b.dataset.mode;}));
+function answerQuestion(){
+ const q=$("question").value.trim(); const grade=$("grade").value; const subject=$("subject").value;
+ const box=$("answerBox"); box.style.display="block";
+ if(!q){box.textContent="Type a question first, then tap Get an answer.";return;}
+ const t=q.toLowerCase(); let answer="";
+ if((t.includes("3/4")&&t.includes("1/4")) || (t.includes("three fourth")&&t.includes("one fourth"))) answer="3/4 + 1/4 = 4/4 = 1 whole. The denominators are the same, so add the top numbers: 3 + 1 = 4.";
+ else if(t.includes("what is a habitat")||t.includes("habitat")) answer="A habitat is the natural home of a living thing. It provides things it needs, such as food, water, shelter and space. For example, a pond is a habitat for frogs and many insects.";
+ else if(t.includes("plant")&&(t.includes("sunlight")||t.includes("sun light")||t.includes("grow"))) answer="Plants need sunlight to make their own food through a process called photosynthesis. They also need water, air and nutrients to grow.";
+ else if(t.includes("electric circuit")||t.includes("circuit")) answer="An electric circuit is a complete path that allows electric current to flow. A simple circuit can include a cell, wires, a switch and a bulb. If the path has a gap, the bulb usually will not light.";
+ else if(t.includes("photosynthesis")) answer="Photosynthesis is the process plants use to make food. They use sunlight, water and carbon dioxide to make sugar and release oxygen.";
+ else if(t.includes("ai stand for")||t.includes("artificial intelligence")) answer="AI stands for artificial intelligence. It is technology that can do tasks such as recognising patterns, understanding language and making predictions.";
+ else if(t.includes("water cycle")) answer="The water cycle is how water moves around Earth. The Sun heats water so it evaporates, water vapour cools and condenses into clouds, and water falls as precipitation such as rain.";
+ else if(t.includes("fraction")) answer="A fraction shows part of a whole. The top number is the numerator; it tells how many parts are counted. The bottom number is the denominator; it tells how many equal parts make the whole. Example: 3/4 means three out of four equal parts.";
+ else if(t.includes("gravity")) answer="Gravity is a force that pulls objects with mass toward each other. Earth's gravity pulls objects toward the ground and helps keep the Moon in orbit around Earth.";
+ else if(t.includes("noun")) answer="A noun is a word that names a person, place, animal, thing or idea. Examples include teacher, Dubai, cat, pencil and happiness.";
+ else if(t.includes("verb")) answer="A verb is a word that tells an action or a state of being. Examples include run, write, think, is and are.";
+ else if(t.includes("prime number")) answer="A prime number is a whole number greater than 1 that has exactly two factors: 1 and itself. Examples are 2, 3, 5, 7 and 11.";
+ else if(t.includes("planet")||t.includes("solar system")) answer="Our Solar System has eight planets orbiting the Sun: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus and Neptune.";
+ else if(t.includes("why is the sky blue")||t.includes("sky blue")) answer="The sky looks blue because air molecules scatter blue sunlight more than most other colours. This scattered blue light reaches our eyes from many directions.";
+ else if(/^\s*what is \d+\s*[+＋]\s*\d+/.test(t)){let m=t.match(/what is (\d+)\s*[+＋]\s*(\d+)/);answer=`${m[1]} + ${m[2]} = ${Number(m[1])+Number(m[2])}.`;}
+ else if(/^\s*\d+\s*[+＋]\s*\d+\s*\??$/.test(t)){let m=t.match(/(\d+)\s*[+＋]\s*(\d+)/);answer=`${m[1]} + ${m[2]} = ${Number(m[1])+Number(m[2])}.`;}
+ else if(/^\s*\d+\s*[-−]\s*\d+\s*\??$/.test(t)){let m=t.match(/(\d+)\s*[-−]\s*(\d+)/);answer=`${m[1]} − ${m[2]} = ${Number(m[1])-Number(m[2])}.`;}
+ if(answer){box.innerHTML='<b>Study Buddy answer · '+grade+'</b><p>'+escapeHTML(answer)+'</p><small>This is a built-in demo answer. Check important schoolwork with your teacher or textbook.</small>';}
+ else {box.innerHTML='<b>Thanks for your question! 🌟</b><p>This demo does not know the answer to that question yet.</p><p>For worldwide answers from KG1 to Grade 12, Study Buddy needs a secure live-AI connection. This file works offline and cannot generate new answers like a real AI chatbot yet.</p><p><b>Your question:</b> '+escapeHTML(q)+'</p><small>Keep this question to test once the live-AI feature is added.</small>';}
+}
+function escapeHTML(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+$("ask").addEventListener("click",answerQuestion);
+function getLesson(){let t=$("topic").value.toLowerCase();if(t.includes("habitat")||t.includes("living thing"))return lessons.habitats;if(t.includes("electric")||t.includes("circuit"))return lessons.electricity;if(t.includes("fraction"))return lessons.fractions;if(t.includes("ai")||t.includes("computer")||t.includes("prompt"))return lessons.computers;return lessons.default;}
+function render(content){$("result").classList.add("show");$("result").innerHTML=content;$("result").scrollIntoView({behavior:"smooth",block:"start"});}
+function start(){const l=getLesson();if(mode==="teach"){render(`<span class="pill">📘 TEACH ME · ${$("grade").value}</span><h2>${l.title}</h2><p class="answer">${l.explain}</p><div class="feedback"><b>Remember:</b> Try explaining the main idea in your own words. Can you give your own example?</div>`)}
+else if(mode==="flash"){ci=0;flipped=false;showCard(l)}
+else if(mode==="quiz"){currentQuiz=l.quiz;qi=0;render(`<span class="pill">🎯 QUIZ TIME</span><h2>${l.title}</h2><p>Five questions. Answer each one to earn points!</p><div id="quizArea"></div>`);showQuestion()}
+else{render(`<span class="pill">💡 FIX MY MISTAKES</span><h2>Let's learn from a mistake</h2><p class="answer">Mistakes are part of learning. Try this example:</p><div class="feedback"><b>Question:</b> In the fraction 3/4, which number is the denominator?<br><br><b>Common mistake:</b> Saying 3.<br><b>Hint:</b> The denominator is the bottom number. In 3/4, it is 4.</div><p>Now try this: In 2/7, what is the denominator?</p><input id="mistakeAnswer" placeholder="Type your answer"><button class="primary" id="checkMistake">Check my answer</button><div id="mistakeFeedback"></div>`);$("checkMistake").onclick=()=>{let a=$("mistakeAnswer").value.trim();$("mistakeFeedback").innerHTML=`<div class="feedback">${a==="7"?"✅ Correct! The denominator is 7.":"Good try! Look at the bottom number in 2/7. The answer is 7."}</div>`;};}}
+function showCard(l){let c=l.cards[ci];render(`<span class="pill">🗂️ FLASHCARDS · ${ci+1} OF ${l.cards.length}</span><h2>${l.title}</h2><div class="flash" id="flipCard"><div><div class="front">${flipped?c[1]:c[0]}</div><div class="hint">${flipped?"Tap to see question":"Tap card to reveal answer"}</div></div></div><div style="display:flex;gap:8px;margin-top:12px"><button class="secondary" id="prev" ${ci===0?"disabled":""}>← Previous</button><button class="primary" id="next" style="margin-top:0">${ci===l.cards.length-1?"Start again":"Next card →"}</button></div>`);$("flipCard").onclick=()=>{flipped=!flipped;showCard(l)};$("prev").onclick=()=>{ci=Math.max(0,ci-1);flipped=false;showCard(l)};$("next").onclick=()=>{ci=ci===l.cards.length-1?0:ci+1;flipped=false;showCard(l)}}
+function showQuestion(){if(qi>=currentQuiz.length){render(`<span class="pill">🏆 QUIZ COMPLETE</span><h2>Well done!</h2><p class="answer">You got ${correct} out of ${currentQuiz.length} questions correct in this round.</p><div class="feedback">Total points: ${score}. Keep practising to improve!</div><button class="primary" id="again">Try quiz again</button>`);$("again").onclick=()=>{qi=0;correct=0;currentQuiz=getLesson().quiz;showQuestion()};updateScore();return;}
+let q=currentQuiz[qi];$("quizArea").innerHTML=`<b>Question ${qi+1} of ${currentQuiz.length}</b><p class="answer">${q[0]}</p><div class="quiz-options">${q[2].map((o,i)=>`<button class="secondary" data-answer="${i}">${String.fromCharCode(65+i)}. ${o}</button>`).join("")}</div><div id="qfeedback"></div>`;
+document.querySelectorAll("[data-answer]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-answer]").forEach(x=>x.disabled=true);let good=Number(b.dataset.answer)===q[3];if(good){score+=10;correct++;b.style.background="#dcfce7";b.style.borderColor="#16a34a"}else{b.style.background="#fee2e2";b.style.borderColor="#dc2626";document.querySelectorAll("[data-answer]")[q[3]].style.background="#dcfce7"}$("qfeedback").innerHTML=`<div class="feedback">${good?"✅ Correct! +10 points.":"💡 Good try! The correct answer is: "+q[1]+"."}<br>${qi===currentQuiz.length-1?"That's the last question!":"Ready for the next one?"}<button class="primary" id="nextQ"> ${qi===currentQuiz.length-1?"See results":"Next question →"}</button></div>`;$("nextQ").onclick=()=>{qi++;showQuestion()};updateScore();});}
+function updateScore(){$("scoreText").textContent=`Quiz points: ${score} · Correct answers in this round: ${correct}`;}
+$("start").onclick=start;$("reset").onclick=()=>{score=0;correct=0;updateScore();};
+</script>
+</body>
+</html>
